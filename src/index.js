@@ -1,33 +1,34 @@
+import path from 'path'
+import cors from 'cors'
 import express from 'express'
 import bodyParser from 'body-parser'
-import logger from 'morgan'
-import methodOverride from 'method-override'
+import graphqlHTTP from 'express-graphql'
+import schema from './schema'
+import loaders from './loaders'
 
 var debug = require('debug')('riqra-service-ads:index')
-
-const app = express()
-const server = require('http').Server(app)
-const port = process.env.PORT
-
-// Allow Cors Header
-function allowCrossTokenHeader (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, Authorization')
-  next()
-}
-
-// Config Server
-app.use(logger('dev'))
+var app = express()
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
-app.use(methodOverride('_method'))
-app.use(allowCrossTokenHeader)
+var port = 3000
 
-require('./initializers/routes')(app)
+app.use('/', cors(), graphqlHTTP((req) => {
+  let baseUrl = `${req.protocol}://${req.headers.host}`
 
-// Server Listen
-server.listen(port, (err) => {
-  if (err) return debug(`Error: Server not started - ${err}`)
-  debug(`Server listing on port ${port}`)
+  process.env.BASE_URL = baseUrl
+
+  return {
+    schema,
+    graphiql: true,
+    context: {
+      user: req.user,
+      loaders: loaders()
+    }
+  }
+}))
+
+app.listen(port, (err) => {
+  if (err) {
+    return debug(`Error server - ${err}`)
+  }
+  debug(`Server Start on port ${port}`)
 })

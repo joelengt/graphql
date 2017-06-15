@@ -85,63 +85,67 @@ Update scripts from `package.json`
 
 ## products
 
+
+### Read All Books
+
 ```
-query {
-	products {
-	  _id
-    name
-    sku
-    name_slugify
-    photo
-    presentation
-    description
-    seo_description
-    time_life
-    offer
-    price
-    unit_price
-    suggested_price
-    stock
-    popularity
-    order
-    need_perception
-    is_always_in_stock
-    is_featured
-    is_archived
-	}
+query book {
+  id
+  name
+  author
+  description
+  release
 }
-
 ```
 
+### Read one book
 
 ```
-query products {
-  products {
-    edges {
-      node {
-        _id
-        name
-        sku
-        name_slugify
-        photo
-        presentation
-        description
-        seo_description
-        time_life
-        offer
-        price
-        unit_price
-        suggested_price
-        stock
-        popularity
-        order
-        need_perception
-        is_always_in_stock
-        is_featured
-        is_archived
-      }
+query book {
+  book (id: "Qm9vazoxMQ==") {
+    name
+    author
+    description
+    release
+  }
+}
+```
+
+### Create Book
+```
+mutation createBook	{
+  createBook(input: {name: "The book100", author: "joelengt2", description: "sdasd", editorial: "la forma", release:1000}) {
+    clientMutationId
+    created_book_id
+    book {
+      id
+      name
     }
   }
 }
 
-``
+```
+### Update Book
+
+```
+mutation book {
+  updateBook (input: {id: 8, name: "The Hiper Book", author: "joelengt2", description: "The value data format", editorial:"valeData", release:2009}) {
+    clientMutationId
+    book {
+      id
+      name
+    }
+  }
+}
+```
+
+### Delete Book
+
+```
+mutation book {
+  deleteBook(input: {ids: [4,7]}) {
+    clientMutationId
+    deleted_book_id
+  }
+}
+```
